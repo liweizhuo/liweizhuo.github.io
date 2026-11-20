@@ -163,3 +163,9 @@ Desktop.ini
 # Misc
 .coze-logs
 .codegraph/
+# Keep legacy sources locally; publish only the maintained static site.
+/*
+!/.gitignore
+!/README.md
+!/.github/
+!/site/
