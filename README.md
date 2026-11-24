@@ -6,6 +6,8 @@
 
 个人介绍 · 项目作品 · 成长经历 · 技能图谱
 
+[**访问个人主页 / 简历链接 ↗**](https://liweizhuo.github.io/)
+
 ![Static Site](https://img.shields.io/badge/Static_Site-HTML_%C2%B7_CSS_%C2%B7_JavaScript-64748b?style=flat-square)
 ![Responsive](https://img.shields.io/badge/Layout-Responsive-78a99a?style=flat-square)
 ![Theme](https://img.shields.io/badge/Theme-Dark_%26_Light-818cf8?style=flat-square)
@@ -39,7 +41,7 @@
 
 ## 设计与交互
 
-🌙 **灰蓝暗色** — 默认采用柔和的深色背景，可切换浅色主题。
+🌙 **深色与浅色** — 默认采用柔和的深色背景，可切换浅色主题。
 
 📖 **专注阅读** — 居中内容、清晰标题、克制装饰与适量留白。
 

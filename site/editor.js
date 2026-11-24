@@ -14,4 +14,3 @@ modal.querySelector('#edit-save').onclick=async()=>{apply();const edits={};recor
 fetch('/edits.json').then(r=>r.ok?r.json():{}).then(edits=>{records.forEach(r=>{const edit=edits[r.key];if(edit&&edit.original===r.original&&typeof edit.text==='string'){r.node.nodeValue=edit.text;draft.set(r.key,edit.text)}})}).catch(()=>{});
 })();
 
-

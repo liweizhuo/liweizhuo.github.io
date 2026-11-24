@@ -92,12 +92,12 @@ cleanPhotoStyle.textContent=`
 document.head.append(cleanPhotoStyle);
 photoMount.remove();
 document.querySelector('#projects').innerHTML=`
-<h1 id="projects-title">项目</h1><p>经营数据问答与商品投放分析，两项从业务问题出发的实践。</p>
+<h1 id="projects-title">项目</h1><p>记录一些从实际问题出发的探索与实践。</p>
 <details class="case"><summary><span class="case-icon" aria-hidden="true">⌘</span><span><span class="case-title">经营分析与指标问答 RAG 系统</span><span class="case-description">让业务人员用自然语言查经营数据，并核对指标口径与来源。</span><span class="case-preview">项目负责人 · RAG + Text-to-SQL</span></span></summary>
 <div class="case-body"><p class="case-meta">2026.05 — 2026.08 · 项目负责人</p>
 <section><h2>把“查口径”和“查数据”放进同一次问答</h2><p>经营人员查询新签、营收、回款时，需要在多个看板、数据表和口径文档之间切换。我设计了一个融合 RAG 与 Text-to-SQL 的问答系统：用户提出问题，系统检索适用口径、生成并执行只读 SQL，再返回数值、周期变化和来源依据。</p></section>
 <section><h2>关键设计：先明确口径，再查询数据</h2><ol class="case-steps"><li><strong>让口径与字段对应。</strong>整理指标定义、时间归属、金额单位及计入、排除条件，与数据库字段建立映射，并记录来源、版本和生效范围。检索不能只找到相似文字，还要确认它适用于当前问题。</li><li><strong>用证据约束 SQL。</strong>将检索到的口径、Schema 和表关联关系组织为模型输入；生成查询后，执行语法树检查与参数绑定，并以只读权限约束数据库访问。</li><li><strong>让结果有依据，异常有交代。</strong>在同一请求中固定数据版本，组织查询结果、计算值和口径证据。回答引用来源；口径冲突、信息不足或无数据时，明确澄清或提示。</li></ol></section>
-<section><h2>验证：分别检查检索、回答与数值</h2><p>构建 100 条以上经营问答评测集，覆盖常规查数、缺失数据、零基期等场景。用 RAGAS 评估检索与回答质量，再通过人工 SQL 对账核验数值。</p><div class="case-metrics"><div><strong>0.94</strong><span>上下文召回率</span></div><div><strong>0.96</strong><span>回答忠实度</span></div><div><strong>97%</strong><span>明确口径查数题数值准确率</span></div></div><p class="case-note">上述结果来自项目评测集；97% 不代表所有开放式经营问题的准确率。</p></section>
+<section><h2>验证：分别检查检索、回答与数值</h2><p>构建 100 条以上经营问答评测集，覆盖常规查数、缺失数据、零基期等场景。用 RAGAS 评估检索与回答质量，再通过人工 SQL 对账核验数值。</p><div class="case-metrics"><div><strong>0.94</strong><span>上下文召回率</span></div><div><strong>0.96</strong><span>回答忠实度</span></div><div><strong>97%</strong><span>明确口径查数题数值准确率</span></div></div></section>
 <details class="case-technical"><summary>实现链路</summary><div><p><strong>知识准备：</strong>父子分块保留指标定义与例外条件，BGE-M3 编码，Milvus 建立稠密与稀疏索引。</p><p><strong>口径检索：</strong>混合召回 → 父块恢复 → CrossEncoder 重排 → 适用性核对。</p><p><strong>查询与回答：</strong>证据与 Schema 动态注入 Prompt，结合 Few-shot 示例调用 ERNIE 4.5 Turbo；SQLGlot 检查后执行查询。FastAPI 串联检索、MySQL 查数、指标计算和来源引用。</p></div></details>
 </div></details>
 <details class="case"><summary><span class="case-icon" aria-hidden="true">▥</span><span><span class="case-title">商品分层与投流效率优化</span><span class="case-description">识别低效商品，把预算逐步转向投产达标、库存充足的款式。</span><span class="case-preview">项目主要成员 · 1,000+ SKU 分层与诊断</span></span></summary>
@@ -235,6 +235,21 @@ if(caseEntries.length===4){
 }
 const projectIds=['rag','product','dodo-skill','user-segmentation'];
 const requestedProject=new URLSearchParams(location.search).get('project');
+if(requestedProject==='rag'){
+  const sourceLink=document.createElement('a');
+  sourceLink.className='inline';
+  sourceLink.href='https://github.com/liweizhuo/business-analysis-rag';
+  sourceLink.target='_blank';sourceLink.rel='noopener noreferrer';
+  sourceLink.innerHTML=document.querySelector('nav a[aria-label="GitHub"]').innerHTML+'<span>查看源码</span>';
+  sourceLink.classList.add('project-source');
+  sourceLink.style.display='inline-flex';
+  sourceLink.style.alignItems='center';
+  sourceLink.style.gap='6px';
+  sourceLink.style.whiteSpace='nowrap';
+  sourceLink.style.fontWeight='400';
+  sourceLink.style.fontSize='13px';
+  caseEntries[0].projectSourceLink=sourceLink;
+}
 caseEntries.forEach((entry,index)=>{
   const summary=entry.querySelector(':scope > summary');
   const link=document.createElement('a');
@@ -248,9 +263,15 @@ caseEntries.forEach((entry,index)=>{
     const thumbnail=document.createElement('img');
     thumbnail.className='project-thumbnail';
     thumbnail.src=thumbnailSource;
-    thumbnail.alt=projectIds[index]==='rag'?'经营问答界面预览':'脱敏周报驾驶舱预览';
+    thumbnail.alt=projectIds[index]==='rag'?'经营问答界面预览':projectIds[index]==='product'?'BCG 四象限框架参考图，非项目实际数据':projectIds[index]==='user-segmentation'?'K-means 四簇聚类示意，非实际用户数据':'脱敏周报驾驶舱预览';
     thumbnail.width=128;thumbnail.height=80;thumbnail.loading='lazy';
-    icon.replaceWith(thumbnail);
+    if(projectIds[index]==='product')thumbnail.classList.add('bcg-thumbnail');
+    if(projectIds[index]==='product'){
+      const media=document.createElement('div');
+      media.className='bcg-media';
+      media.append(thumbnail);icon.replaceWith(media);
+    }else icon.replaceWith(thumbnail);
+    if(projectIds[index]==='product'){const note=document.createElement('span');note.className='case-preview';note.textContent='封面：BCG 框架参考（非实际项目数据）';link.querySelector('.case-description').after(note);}
   }
   const overview=document.createElement('article');
   overview.className='case-list-item';
@@ -264,7 +285,13 @@ caseEntries.forEach((entry,index)=>{
     summary.hidden=true;
     const heading=document.querySelector('#projects-title');
     heading.textContent=title;
-    const subtitle=heading.nextElementSibling;
+    if(entry.projectSourceLink){
+      const titleRow=document.createElement('div');
+      titleRow.className='project-title-row';
+      heading.before(titleRow);
+      titleRow.append(heading,entry.projectSourceLink);
+    }
+    const subtitle=heading.closest('.project-title-row')?.nextElementSibling||heading.nextElementSibling;
     subtitle.textContent=link.querySelector('.case-description').textContent;
     entry.querySelectorAll('.case-technical').forEach(technical=>{
       const section=document.createElement('section');
@@ -280,6 +307,10 @@ const projectListItems=Array.from(document.querySelectorAll('#projects > .case-l
   const heading=document.createElement('h2');
   heading.className='project-group-title';heading.textContent=name;
   projectListItems[index]?.before(heading);
+  const grid=document.createElement('div');
+  grid.className='project-card-grid';
+  heading.after(grid);
+  projectListItems.slice(index,index+2).forEach(item=>grid.append(item));
 });
 const groupStyle=document.createElement('style');
 groupStyle.textContent='.project-group-title{font-size:15px;font-weight:550;color:var(--muted);margin:38px 0 4px;letter-spacing:.03em}.view-project-detail .project-group-title{display:none}';
@@ -297,10 +328,25 @@ if(projectIds.includes(requestedProject)){
 }
 const pageStyle=document.createElement('style');pageStyle.textContent=`
 .project-thumbnail{display:block;flex-shrink:0;width:128px;height:auto;aspect-ratio:1.65;object-fit:cover;object-position:top left;border:1px solid var(--line);border-radius:6px;margin-top:3px}
+.project-title-row{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 18px;margin-bottom:24px}.project-title-row #projects-title{margin-bottom:0}.project-title-row .project-source{color:var(--muted)}.project-title-row .project-source:hover{color:var(--strong)}
 @media(max-width:640px){.project-thumbnail{width:88px;aspect-ratio:1.4}}
 .case-list-item{border-bottom:1px solid var(--line)}.case-page-link{display:flex;align-items:flex-start;gap:16px;padding:27px 0;color:var(--strong);text-decoration:none}.case-page-link:hover .case-title{text-decoration:underline;text-underline-offset:5px}.case[hidden]{display:none!important}.view-project-detail .case-list-item{display:none}.case-detail-page{border:0;padding:0}.case-detail-page>summary{display:none!important}.case-detail-page .case-body{padding:0}.project-return{display:inline-block;font-size:13px;margin-bottom:24px}.view-project-detail #projects-title{font-size:29px;line-height:1.5}.view-project-detail .back{display:none!important}@media(max-width:640px){.case-page-link{gap:12px}.view-project-detail #projects-title{font-size:24px}}
 `;document.head.append(pageStyle);
 
-
-
+// Return to a simple project list; analytical projects use their original icons.
+const simpleListStyle=document.createElement('style');
+simpleListStyle.textContent=`
+.project-card-grid{display:block}
+.project-group-title{margin:36px 0 8px}
+.project-card-grid .case-list-item{border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent}
+.project-card-grid .case-page-link{display:flex;flex-direction:row;align-items:flex-start;gap:18px;padding:24px 0;text-decoration:none}
+.project-card-grid .project-thumbnail{width:112px;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:top left;border:1px solid var(--line);border-radius:6px;flex-shrink:0}
+.project-card-grid .case-icon{width:38px;height:38px;aspect-ratio:auto;font-size:24px;flex-shrink:0}
+.project-card-grid .case-title{font-size:17px}
+.project-card-grid .case-description{font-size:14px;margin-top:6px}
+.project-card-grid .case-preview{font-size:12px;margin-top:8px}
+.view-project-detail .project-card-grid{display:none}
+@media(max-width:640px){.project-card-grid .project-thumbnail{width:86px}.project-card-grid .case-page-link{gap:13px}.project-card-grid .case-title{font-size:16px}}
+`;
+document.head.append(simpleListStyle);
 
